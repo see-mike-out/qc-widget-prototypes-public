@@ -1,4 +1,6 @@
 <script>
+  import { get_radian_names } from "./svg_utils/util";
+
   export let info;
 </script>
 
@@ -40,6 +42,15 @@
             >
           </tr>
         {/if}
+
+        {#if info.operation.params}
+          {#each info.operation.params as param, pi}
+            <tr>
+              <th>Parameter {pi + 1}</th><td>{get_radian_names(param)}</td>
+            </tr>
+          {/each}
+        {/if}
+
         {#if info.layer_match?.matches && info.this_circuit_id === "original-circuit"}
           <tr>
             <th>Matches (layer-op)</th><td
@@ -76,7 +87,6 @@
 
 <style>
   h2 {
-    width: calc(100% - 0.5rem);
     margin: 0;
     padding: 0.5rem 1rem 1rem 1rem;
     font-size: 1rem;
@@ -88,7 +98,7 @@
     padding: 0;
   }
   table {
-    width: calc(100% - 0.5rem);
+    width: 100%;
     font-family: iosevka;
     border-collapse: collapse;
     border-radius: 0.5rem;

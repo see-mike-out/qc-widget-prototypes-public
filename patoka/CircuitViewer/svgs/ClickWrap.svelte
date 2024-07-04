@@ -22,7 +22,8 @@
           "qubit-group-click-wrap",
           "gate-group-click-wrap",
           "qubit-node-click-wrap",
-          "op-gate-error-group-click-wrap"
+          "op-gate-error-group-click-wrap",
+          "esp-bar-click-wrap"
         ].includes(data.role)
       ) {
         open_tool(data);

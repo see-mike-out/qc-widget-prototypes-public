@@ -4,6 +4,8 @@ import { ISWAP } from "./gates/iswap";
 import { MEASURE } from "./gates/measure";
 import { RZ } from "./gates/rz";
 import { SX } from "./gates/sx";
+import { CUSTOM } from "./gates/custom";
+import { BARRIER } from "./gates/barrier";
 
 
 export const gate_data = {
@@ -12,7 +14,8 @@ export const gate_data = {
   RZ,
   SX,
   CX,
-  CCX
+  CCX,
+  CUSTOM
 };
 
 
@@ -45,8 +48,12 @@ export function planGateDrawing(op, layer_index) {
     output = SX.plan(op, layer_index);
   } else if (op.gate === CX.name) {
     output = CX.plan(op, layer_index);
+  } else if (op.gate === BARRIER.name) {
+    // some common gate?
+    output = BARRIER.plan(op, layer_index);
   } else {
     // some common gate?
+    output = CUSTOM.plan(op, op.gate, layer_index);
   }
   if (output) {
     output.role = "gate-group";

@@ -5,6 +5,9 @@ import { get_radian_names } from "./util";
 let meta_data_area_width = 160, title_area_height = 30;
 
 export function planMachineView(data, operation_data, config) {
+  // adjust color scale
+  if (config?.nodeColorScale && config?.nodeColorScale.domain) config?.nodeColorScale.domain([operation_data.esp, Math.max(0.9, 1 - operation_data.esp / 2), 1]);
+
   // sizing
   let width = 0, height = 0;
   // machine layout
@@ -82,6 +85,8 @@ export function planMachineView(data, operation_data, config) {
     g.x = x;
     g.y = y;
 
+    let measure_esp = 1 - readout_error.value;
+
     // qubit marker
     g.elem.push({
       type: "circle",
@@ -93,8 +98,8 @@ export function planMachineView(data, operation_data, config) {
       r,
       stroke: defualt_color,
       "stroke-width": 2,
-      fill: "#ff0000",
-      "fill-opacity": readout_error.value
+      fill: config?.nodeColorScale(1),
+      // "fill-opacity": (1 - readout_error.value)
     });
 
     // qubit marker text
@@ -257,22 +262,25 @@ export function planMachineView(data, operation_data, config) {
   machine.width = width;
   machine.height = height;
 
-  machine.elem.push(qubit_nodes)
-  machine.elem.push(qubit_edges)
+  machine.elem.push(qubit_nodes);
+
+  machine.elem.push(qubit_edges);
+
+  // operation animation data;
+  // esp rate prep
+  // let min_esp_rate = 1;
+  // for (const info of data.gate_info) {
+  //   min_esp_rate = Math.min(1 - info.gate_error.value, min_esp_rate)
+  // }
+  // for (const i in data.readout_errors) {
+  //   min_esp_rate = Math.min(1 - data.readout_errors[i].value, min_esp_rate)
+  // }
+
+  let error_cap = operation_data.esp;
+  let qubit_wise_esp_data = [], cumul_esp_data = [];
 
   // operation animation data;
   let operations = [], lcnt = 0;
-
-  let max_error_rate = 0;
-  for (const info of data.gate_info) {
-    max_error_rate = Math.max(info.gate_error.value, max_error_rate)
-  }
-  for (const i in data.readout_errors) {
-    max_error_rate = Math.max(data.readout_errors[i].value, max_error_rate)
-  }
-
-  let error_cap = Math.ceil(max_error_rate * 100) / 100;
-
   for (const layer_data of operation_data.layers) {
     let ops = {
       type: "g",
@@ -315,6 +323,7 @@ export function planMachineView(data, operation_data, config) {
       text: `Layer: ${lcnt}` + (lcnt === operation_data.layers.length - 1 ? " (last)" : "")
     });
 
+    cumul_esp_data[lcnt] = cumul_esp_data[lcnt - 1] || 1;
     for (const op_data of layer_data.operations) {
       let gate_info = data.gate_info.filter((d) =>
         bit_order_match(op_data.qubits.map(e => e.index), d?.qubits) &&
@@ -327,6 +336,23 @@ export function planMachineView(data, operation_data, config) {
       if (op_data.gate === "measure") {
         gate_error = data.readout_errors[op_data.qubits[0].index]?.value;
       }
+      cumul_esp_data[lcnt] = cumul_esp_data[lcnt] * (1 - gate_error);
+
+      if (!qubit_wise_esp_data[lcnt]) qubit_wise_esp_data[lcnt] = data?.design?.nodes.map(() => []);
+
+      for (let _espi in qubit_wise_esp_data[lcnt]) {
+        let espi = parseInt(_espi)
+        qubit_wise_esp_data[lcnt][espi] = qubit_wise_esp_data[lcnt - 1]?.[espi] || 1;
+        if (!qubit_nodes.elem[espi].data.esp_value) qubit_nodes.elem[espi].data.esp_value = []
+        if (gate_info?.qubits?.includes(espi)) {
+          qubit_wise_esp_data[lcnt][espi] = qubit_wise_esp_data[lcnt][espi] * (1 - gate_error);
+        } else if (op_data.gate === "measure" && op_data.qubits[0].index === espi) {
+          qubit_wise_esp_data[lcnt][espi] = qubit_wise_esp_data[lcnt][espi] * (1 - gate_error);
+        }
+        qubit_nodes.elem[espi].data.esp_value[lcnt] = qubit_wise_esp_data[lcnt][espi];
+      }
+
+
 
       let { edges, edge_ids } = get_edges(gate_info, edge_dict);
       let match_color;
@@ -351,14 +377,16 @@ export function planMachineView(data, operation_data, config) {
           transpiled_circuit_id: config?.transpiled_circuit_id,
           layer: lcnt,
           operation: ocnt,
-          original_layer: layer_match.layer,
-          original_operation: layer_match.operation,
+          original_layer: layer_match?.layer,
+          original_operation: layer_match?.operation,
           duration,
           unit: gate_info?.gate_length?.unit,
           edges,
           edge_ids,
           match_color,
-          gate_error
+          gate_error,
+          esp_qubit_wise: qubit_wise_esp_data[lcnt],
+          esp_cumulative: cumul_esp_data[lcnt]
         }
       };
 
@@ -469,10 +497,12 @@ export function planMachineView(data, operation_data, config) {
           }
         }
       }
+
       // gate error information 
       if (gate_error !== undefined) {
         let gate_error_x = width + circuit_h_gap * 2;
         let gate_error_y = ocnt * qubit_node_wh + padding + 16 + 48;
+        let esp_value = qubit_wise_esp_data[lcnt][gate_qubits[0]];
         let gate_error_g = {
           type: "g",
           role: "op-gate-error-group",
@@ -490,18 +520,18 @@ export function planMachineView(data, operation_data, config) {
             "alignment-baseline": "bottom",
             "font-weight": 700,
             type: "text",
-            text: "Gate error info"
+            text: "ESP info"
           });
-          gate_error_g.elem.push({
-            type: "text",
-            x: meta_data_area_width - padding,
-            y: 12,
-            "font-size": 12,
-            "text-anchor": "end",
-            "alignment-baseline": "bottom",
-            text: `(${error_cap})`,
-            fill: "#999999"
-          });
+          // gate_error_g.elem.push({
+          //   type: "text",
+          //   x: meta_data_area_width - padding,
+          //   y: 12,
+          //   "font-size": 12,
+          //   "text-anchor": "end",
+          //   "alignment-baseline": "bottom",
+          //   text: `(${error_cap})`,
+          //   fill: "#999999"
+          // });
         }
         gate_error_g.elem.push({
           type: "text",
@@ -513,7 +543,7 @@ export function planMachineView(data, operation_data, config) {
           "font-size": 12,
           "text-anchor": "start",
           "alignment-baseline": "bottom",
-          text: op_data.gate + `(${gate_qubits.join(",")})` + ": " + gate_error.toString().slice(0, 7)
+          text: op_data.gate + `(${gate_qubits.join(",")})` + ": " + esp_value.toString().slice(0, 7)
         });
         gate_error_g.elem.push({
           type: "rect",
@@ -532,10 +562,10 @@ export function planMachineView(data, operation_data, config) {
           class: "op-gate-error-bar",
           x: 0,
           y: 22,
-          width: (meta_data_area_width - padding) * (gate_error / error_cap),
+          width: (meta_data_area_width - padding) * (esp_value - error_cap) / (1 - error_cap),
           height: 16,
-          fill: "#ff0000",
-          "fill-opacity": gate_error / error_cap
+          fill: config?.nodeColorScale((esp_value - error_cap) / (1 - error_cap)),
+          // "fill-opacity": (esp_value - error_cap) / (1 - error_cap)
         })
         gate_error_g.elem.push({
           type: "click-wrap",
@@ -554,7 +584,8 @@ export function planMachineView(data, operation_data, config) {
               qubits: gate_qubits,
               gate: op_data.gate,
               gate_duration: duration,
-              duration_unit: gate_info?.gate_length?.unit
+              duration_unit: gate_info?.gate_length?.unit,
+              esp: esp_value
             }
           }
         })
@@ -581,7 +612,6 @@ export function planMachineView(data, operation_data, config) {
     ops.duration = total_duration;
     operations.push(ops);
   }
-
 
   return {
     type: "svg",

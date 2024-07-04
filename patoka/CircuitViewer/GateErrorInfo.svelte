@@ -41,7 +41,6 @@
     line-height: 100%;
   }
   h2 {
-    width: calc(100% - 0.5rem);
     margin: 0;
     padding: 0.5rem 1rem 1rem 1rem;
     font-size: 1rem;
@@ -53,7 +52,7 @@
     padding: 0;
   }
   table {
-    width: calc(100% - 0.5rem);
+    width: 100%;
     font-family: Iosevka;
     border-collapse: collapse;
     border-radius: 0.5rem;

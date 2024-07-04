@@ -1,7 +1,8 @@
 import { planGateDrawing } from "./plan_gate";
 
-import { circuit_line_height, circuit_v_gap, circuit_h_gap, qubit_ref_width, padding, moment_bar_height, ord_colors } from "./constants"
+import { circuit_line_height, circuit_v_gap, circuit_h_gap, qubit_ref_width, padding, moment_bar_height, ord_colors, esp_area_height, defualt_color } from "./constants"
 import { get_radian_names } from "./util";
+import { plan_esp_chart } from "./plan_esp";
 
 export function planDrawing(data, config) {
   if (!data) return null;
@@ -11,7 +12,7 @@ export function planDrawing(data, config) {
 
   let is_transpiled_bitmatch = !config?.is_original && config?.match?.bit_match
   let transpiled_bitmatch = config?.match?.bit_match;
-  let qubit_area_width = qubit_ref_width + (!config?.is_original && config?.match?.bit_match ? qubit_ref_width : 0);
+  let qubit_area_width = qubit_ref_width + (!config?.is_original && config?.match?.bit_match ? qubit_ref_width * 1.25 : 0);
 
   // global phase
   let phase_marker;
@@ -264,6 +265,20 @@ export function planDrawing(data, config) {
     line.y2 = line.y1;
   });
 
+  // esp
+  let esp_axis_group, esp_group;
+  if (data.esp !== undefined) {
+    [esp_axis_group, esp_group] = plan_esp_chart({
+      x: padding + qubit_area_width + circuit_h_gap,
+      y: height + circuit_v_gap * 4,
+      width: circuit_width,
+      height: esp_area_height
+    },
+      data,
+      circuit_body);
+    height += esp_area_height + circuit_v_gap * 4;
+  }
+
   let final_plan = {
     type: "svg",
     width: width + padding * 2,
@@ -307,7 +322,9 @@ export function planDrawing(data, config) {
         role: "circuit_body",
         data: data.layers
       },
-      phase_marker
+      phase_marker,
+      esp_group,
+      esp_axis_group
     }
   }
 
@@ -345,6 +362,8 @@ export function planDrawing(data, config) {
     final_plan.groups.qubit_group.y += y_increment;
     final_plan.groups.circuit_line_group.y += y_increment;
     final_plan.groups.circuit_group.y += y_increment;
+    if (final_plan.groups.esp_group) final_plan.groups.esp_group.y += y_increment;
+    if (final_plan.groups.esp_axis_group) final_plan.groups.esp_axis_group.y += y_increment;
 
     final_plan.groups.moment_group = moment_group;
   }

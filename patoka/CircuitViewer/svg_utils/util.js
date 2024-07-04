@@ -1,31 +1,29 @@
+let ratio_divider = [2, 3, 4, 6, 8, 16, 32];
+
 export function get_radian_names(value) {
-  let ratio = value / Math.PI
-  if (ratio == 0)
-    return "0";
-  else if (ratio == 1 / 4)
-    return "π/4";
-  else if (ratio == 1 / 3)
-    return "π/3";
-  else if (ratio == 1 / 2)
-    return "π/2";
-  else if (ratio == 2 / 3)
-    return "2π/3";
-  else if (ratio == 3 / 4)
-    return "3π/4";
+  let ratio = value / Math.PI;
+  if (ratio == 0) return "0";
   else if (ratio == 1)
     return "π";
-  else if (ratio == -1 / 4)
-    return "-π/4";
-  else if (ratio == -1 / 3)
-    return "-π/3";
-  else if (ratio == -1 / 2)
-    return "-π/2";
-  else if (ratio == -2 / 3)
-    return "-2π/3";
-  else if (ratio == -3 / 4)
-    return "-3π/4";
   else if (ratio == -1)
     return "-π";
+  else {
+    let sign = ratio < 0 ? "-" : "";
+    let abs_ratio = Math.abs(ratio);
+    let done = [];
+    for (let div of ratio_divider) {
+      for (let nom = 1; nom < div; nom++) {
+        if (!done.includes(nom / div)) {
+          if (abs_ratio == nom / div) {
+            return sign + (nom == 1 ? "" : nom) + "π/" + div;
+          } else {
+            done.push(nom / div);
+          }
+        }
+      }
+    }
+    return value;
+  }
 }
 
 export function getGradient(colors) {
@@ -67,4 +65,52 @@ export function addGradientDef(pid, def) {
 }
 export function removeGradientDef(pid, def_ids) {
 
+}
+
+export function getSVGimageLink(id, res) {
+  // ref: https://stackoverflow.com/questions/23218174/how-do-i-save-export-an-svg-file-after-creating-an-svg-with-d3-js-ie-safari-an
+  // ref: https://www.cjav.dev/articles/svg-to-png-with-javascript
+  //get svg element.
+  let svg = document.getElementById(id);
+  let width = svg.clientWidth, height = svg.clientHeight;
+
+  //get svg source.
+  let serializer = new XMLSerializer();
+  let source = serializer.serializeToString(svg);
+
+  //add name spaces.
+  if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+    source = source.replace(
+      /^<svg/,
+      '<svg xmlns="http://www.w3.org/2000/svg"',
+    );
+  }
+  if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+    source = source.replace(
+      /^<svg/,
+      '<svg xmlns:xlink="http://www.w3.org/1999/xlink"',
+    );
+  }
+
+  //add xml declaration
+  source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+  let svg_blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+  let svg_blob_url = URL.createObjectURL(svg_blob);
+
+  let canvas = document.createElement("canvas");
+  canvas.setAttribute("width", width);
+  canvas.setAttribute("height", height);
+  document.body.appendChild(canvas);
+  let ctx = canvas.getContext("2d");
+  let img = new Image();
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0);
+    let png = canvas.toDataURL("image/png");
+    URL.revokeObjectURL(png);
+    if (res && res.set) res.set({ png, id, svg: svg_blob_url });
+    canvas.remove();
+  };
+  img.src = svg_blob_url;
 }

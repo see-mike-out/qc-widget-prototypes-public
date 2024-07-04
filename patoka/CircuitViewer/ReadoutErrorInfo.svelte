@@ -1,5 +1,8 @@
 <script>
-  export let info;
+  import { writable } from "svelte/store";
+
+  export let info,
+    machine_moment_at = writable();
 </script>
 
 {#if info}
@@ -20,6 +23,13 @@
               <th>Readout error</th><td>{info.readout_error.value} </td>
             </tr>
           {/if}
+          {#if info.esp_value && $machine_moment_at !== undefined}
+            <tr>
+              <th>ESP at {$machine_moment_at}</th><td
+                >{info.esp_value[$machine_moment_at]}
+              </td>
+            </tr>
+          {/if}
         </tbody>
       </table>
     </div>
@@ -32,7 +42,6 @@
     line-height: 100%;
   }
   h2 {
-    width: calc(100% - 0.5rem);
     margin: 0;
     padding: 0.5rem 1rem 1rem 1rem;
     font-size: 1rem;
@@ -45,7 +54,7 @@
     margin-bottom: 0.5rem;
   }
   table {
-    width: calc(100% - 0.5rem);
+    width: 100%;
     font-family: Iosevka;
     border-collapse: collapse;
     border-radius: 0.5rem;

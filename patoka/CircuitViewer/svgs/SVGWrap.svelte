@@ -9,11 +9,14 @@
   import Text from "./Text.svelte";
 
   export let data = {},
-    open_tool = () => {};
+    open_tool = () => {},
+    openTooltip = () => {},
+    closeTooltip = () => {},
+    moveTooltip = () => {};
 </script>
 
 {#if data?.type === "g"}
-  <G {data} {open_tool}></G>
+  <G {data} {open_tool} {openTooltip} {closeTooltip} {moveTooltip}></G>
 {:else if data?.type === "click-wrap"}
   <ClickWrap {data} {open_tool}></ClickWrap>
 {:else if data?.type === "line"}

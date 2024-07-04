@@ -1,35 +1,39 @@
 <script>
   import SvgWrap from "./SVGWrap.svelte";
   export let data = {},
-    open_tool = () => {};
+    open_tool = () => {},
+    openTooltip = () => {},
+    closeTooltip = () => {},
+    moveTooltip = () => {};
+
   function getQubitMatchEls(data) {
     let el1, el2, el3;
     if (data._class.includes(" original")) {
       el1 = document.querySelector(
-        `#${data.data.this_circuit_id} .qubit-background.qubit-${data.data.bit_match.from}`,
+        `#${data.data.this_circuit_id}-sticky .qubit-background.qubit-${data.data.bit_match.from}`,
       );
       el2 = document.querySelector(
-        `#${data.data.matched_circuit_id} .qubit-background.qubit-${data.data.bit_match.to}`,
+        `#${data.data.matched_circuit_id}-sticky .qubit-background.qubit-${data.data.bit_match.to}`,
       );
       el3 = document.querySelector(
         `#${data.data.matched_machine_id} #qubit-node-${data.data.bit_match.to}--group`,
       );
     } else if (data._class.includes(" transpiled")) {
       el1 = document.querySelector(
-        `#${data.data.matched_circuit_id} .qubit-background.qubit-${data.data.bit_match.from}`,
+        `#${data.data.matched_circuit_id}-sticky .qubit-background.qubit-${data.data.bit_match.from}`,
       );
       el2 = document.querySelector(
-        `#${data.data.this_circuit_id} .qubit-background.qubit-${data.data.bit_match.to}`,
+        `#${data.data.this_circuit_id}-sticky .qubit-background.qubit-${data.data.bit_match.to}`,
       );
       el3 = document.querySelector(
         `#${data.data.matched_machine_id} #qubit-node-${data.data.bit_match.to}--group`,
       );
     } else if (data._class.includes("qubit-node--group")) {
       el1 = document.querySelector(
-        `#${data.data.original_circuit_id} .qubit-background.qubit-${data.data.original_qubit_id}`,
+        `#${data.data.original_circuit_id}-sticky .qubit-background.qubit-${data.data.original_qubit_id}`,
       );
       el2 = document.querySelector(
-        `#${data.data.transpiled_circuit_id} .qubit-background.qubit-${data.data.qubit_id}`,
+        `#${data.data.transpiled_circuit_id}-sticky .qubit-background.qubit-${data.data.qubit_id}`,
       );
       el3 = document.querySelector(
         `#${data.data.id} #qubit-node-${data.data.qubit_id}--group`,
@@ -63,26 +67,32 @@
         ),
       );
     } else if (data._class.includes(" transpiled")) {
-      els = data.data.layer_match.colleagues.map((d) => {
-        return document.querySelector(
-          `#${data.data.this_circuit_id} #layer-${d[0]}--interaction-wrap`,
+      els =
+        data?.data?.layer_match?.colleagues?.map((d) => {
+          return document.querySelector(
+            `#${data.data.this_circuit_id} #layer-${d[0]}--interaction-wrap`,
+          );
+        }) || [];
+      if (data?.data?.layer_match?.layer !== undefined) {
+        els.push(
+          document.querySelector(
+            `#${data.data.matched_circuit_id} #layer-${data.data.layer_match.layer}--interaction-wrap`,
+          ),
         );
-      });
-      els.push(
-        document.querySelector(
-          `#${data.data.matched_circuit_id} #layer-${data.data.layer_match.layer}--interaction-wrap`,
-        ),
-      );
-      tel = data.data.layer_match.colleagues.map((d) => {
-        return document.querySelector(
-          `#${data.data.this_circuit_id} .gate-wrap.layer-${d[0]}.gate-${d[1]}`,
+      }
+      tel =
+        data?.data?.layer_match?.colleagues?.map((d) => {
+          return document.querySelector(
+            `#${data.data.this_circuit_id} .gate-wrap.layer-${d[0]}.gate-${d[1]}`,
+          );
+        }) || [];
+      if (data?.data?.layer_match?.layer !== undefined) {
+        tel.push(
+          document.querySelector(
+            `#${data.data.matched_circuit_id} .gate-wrap.layer-${data.data.layer_match.layer}.gate-${data.data.layer_match.operation}`,
+          ),
         );
-      });
-      tel.push(
-        document.querySelector(
-          `#${data.data.matched_circuit_id} .gate-wrap.layer-${data.data.layer_match.layer}.gate-${data.data.layer_match.operation}`,
-        ),
-      );
+      }
     }
     return [els, tel];
   }
@@ -125,10 +135,17 @@
             el.style.outline = `2px solid  ${data.data.match_color}`;
           });
         }
+      } else if (data.role === "esp-bar--group") {
+        let content = `<span class="item">ESP (this layer): ${data.data.esp_this}</span>
+        <span class="item">ESP (cumulative): ${data.data.esp_total}</span>`;
+        openTooltip(e, content);
       }
     }}
+    on:mousemove={(e) => {
+      moveTooltip(e);
+    }}
     on:mouseout={(e) => {
-      if (data.role === "qubit-group"|| data.role === "qubit-node--group") {
+      if (data.role === "qubit-group" || data.role === "qubit-node--group") {
         let [el1, el2, el3] = getQubitMatchEls(data);
         if (el1) {
           el1.style.fill = "transparent";
@@ -151,11 +168,14 @@
             el.style.outline = null;
           });
         }
+      } else if (data.role === "esp-bar--group") {
+        closeTooltip();
       }
     }}
   >
     {#each data.elem as el}
-      <SvgWrap data={el} {open_tool}></SvgWrap>
+      <SvgWrap data={el} {open_tool} {openTooltip} {closeTooltip} {moveTooltip}
+      ></SvgWrap>
     {/each}
   </g>
 {/if}

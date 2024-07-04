@@ -1,6 +1,7 @@
 from qiskit_draw_utils import getCircuitLayout
 from match_circuit import matchCircuitLayouts
 from backend_prep import getBackendData
+from esp import getESP
 from qiskit.circuit import CircuitInstruction
 import json
 
@@ -13,6 +14,7 @@ def prepareData(circuit, pass_manager, backend):
         trans = pass_manager.run(circuit)
         layer_original = getCircuitLayout(circuit)
         layer_trans = getCircuitLayout(trans)
+        (layer_trans, total_esp) = getESP(layer_trans, backend_data)
         circuit_matches = matchCircuitLayouts(layer_original, layer_trans, pass_manager)
         match_results = [m["to"]["complete"] for m in circuit_matches["layer_match"]]
         match_scores = sum([m["to"]["un_matches"] for m in circuit_matches["layer_match"]])
@@ -23,7 +25,8 @@ def prepareData(circuit, pass_manager, backend):
                 "transpiled_circuit": trans,
                 "transpiled_circuit_layered": layer_trans,
                 "traspiling_match": circuit_matches,
-                "backend_data": backend_data
+                "backend_data": backend_data,
+                "esp": total_esp
             })
             break
         elif match_scores < min_match_score:
@@ -34,7 +37,8 @@ def prepareData(circuit, pass_manager, backend):
                 "transpiled_circuit": trans,
                 "transpiled_circuit_layered": layer_trans,
                 "traspiling_match": circuit_matches,
-                "backend_data": backend_data
+                "backend_data": backend_data,
+                "esp": total_esp
             })
     return return_data
 
@@ -57,6 +61,7 @@ class PassData:
         self.backend_data = data["backend_data"]
         self.original_global_phase = get_global_pahse(data["original_circuit"][2])
         self.transpiled_global_phase = get_global_pahse(data["transpiled_circuit"][2])
+        self.esp = data["esp"]
 
     def toJSON(self):
         return json.dumps({
@@ -74,7 +79,8 @@ class PassData:
                 "clbits": bitsToList(self.transpiled_circuit.clbits),
                 "num_qubits": self.transpiled_circuit.num_qubits,
                 "num_clbits": self.transpiled_circuit.num_clbits,
-                "global_phase": self.transpiled_global_phase
+                "global_phase": self.transpiled_global_phase,
+                "esp": self.esp
             },
             "match": self.traspiling_match,
             "backend": self.backend_data

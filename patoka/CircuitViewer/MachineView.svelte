@@ -3,11 +3,9 @@
   import { planMachineView } from "./svg_utils/plan_draw_machine";
   import SvgWrap from "./svgs/SVGWrap.svelte";
   import { writable } from "svelte/store";
-  // import { browser } from "$app/environment";
-  
-const browser = true;
   import MachineViewProgress from "./MachineViewProgress.svelte";
   import LayerTimeMarker from "./LayerTimeMarker.svelte";
+  import { scaleSequential, interpolateRdYlGn } from "d3";
   import {
     addGradientDef,
     getGradient,
@@ -19,8 +17,9 @@ const browser = true;
     transpiled_circuit_id,
     match,
     operation_data,
+    machine_moment_at = writable(0),
     open_tool = () => {};
-
+  let browser = true;
   let drawPlan;
   let curr_layer = writable(null),
     anim_curr_layer = writable(0);
@@ -29,14 +28,18 @@ const browser = true;
     is_playing = false;
   let total_duration = 10;
 
+  let nodeColorScale = scaleSequential(interpolateRdYlGn);
+
   curr_layer.subscribe((i) => {
     dehighlight_edge_gate();
     if (i >= 0 && i <= drawPlan?.operations?.length - 1) highlight_edge_gate(i);
+    change_node_esp(i);
   });
 
   anim_curr_layer.subscribe((i) => {
     dehighlight_edge_gate();
     if (i >= 0 && i <= drawPlan?.operations?.length - 1) highlight_edge_gate(i);
+    change_node_esp(i);
   });
 
   $: {
@@ -52,12 +55,13 @@ const browser = true;
         original_circuit_id,
         transpiled_circuit_id,
         match,
+        nodeColorScale,
       });
       total_duration = drawPlan.operations
         ?.map((e) => e.duration)
         .reduce((a, c) => a + c, 0);
+      change_node_esp(0);
     }
-    console.log(drawPlan);
   }
 
   let gradientDefs = [];
@@ -69,10 +73,12 @@ const browser = true;
         original_circuit_id,
         transpiled_circuit_id,
         match,
+        nodeColorScale,
       });
       total_duration = drawPlan.operations
         ?.map((e) => e.duration)
         .reduce((a, c) => a + c, 0);
+      change_node_esp(0);
     }
   });
 
@@ -156,7 +162,6 @@ const browser = true;
               el.style.fillOpacity = `0.4`;
             }
           });
-          console.log(op_group.data);
           let oid = op_group.data.operation;
           let top_elem = document.querySelector(
             `#${transpiled_circuit_id} .gate-wrap.layer-${i}.gate-${oid}.transpiled`,
@@ -234,6 +239,21 @@ const browser = true;
       el.style.outline = null;
     });
   }
+  function change_node_esp(li) {
+    let point = drawPlan?.operations[li].elem?.filter(
+      (d) => d.role === "op-layer-operation-group",
+    )?.[0];
+    if (point) {
+      data?.design?.nodes?.forEach((node, ni) => {
+        machine_moment_at.set(li);
+        let value =
+          (point.data?.esp_qubit_wise?.[node.index] - operation_data.esp) /
+          (1 - operation_data.esp);
+        let el = document.querySelector(`#qubit-node-${node.index}--node`);
+        if (el) el.setAttribute("fill", nodeColorScale(value));
+      });
+    }
+  }
 
   function quit_animate() {
     is_playing = false;
@@ -255,6 +275,12 @@ const browser = true;
     height={drawPlan.height}
     viewBox={drawPlan.viewBox.join(" ")}
   >
+    <style>
+      g {
+        font-family: Iosevka;
+        font-size: 14px;
+      }
+    </style>
     {#if drawPlan.groups.machine}
       <SvgWrap data={drawPlan.groups.machine} {open_tool}></SvgWrap>
     {/if}
@@ -360,13 +386,18 @@ const browser = true;
       </div>
     </div>
   {/if}
+  <span class="note">
+    To support how each qubit contributes to the overall success, each qubit
+    node shows its own ESP (estimated success probability) as the product of ESP
+    values of the operations that have been applied to the qubit so far (i.e.,
+    up to the current moment). Thus, the term may be different then the overall
+    ESP value which is the product of the ESP values of all the operations in
+    the circut. The overall ESP value change is shown in the transpiled circuit
+    view.
+  </span>
 {/if}
 
 <style>
-  svg {
-    font-family: Iosevka;
-    font-size: 14px;
-  }
   .button-wrap {
     margin: 1rem 0;
   }
@@ -381,5 +412,9 @@ const browser = true;
   }
   .button-wrap button:hover {
     background-color: #f0f0f0;
+  }
+  .note {
+    color: #787878;
+    font-size: 0.9rem;
   }
 </style>

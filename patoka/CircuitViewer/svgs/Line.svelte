@@ -15,6 +15,7 @@
     y2={data.y2 !== undefined ? data.y2 : data.y1}
     stroke={data.stroke || defualt_color}
     stroke-width={data["stroke-width"] !== undefined ? data["stroke-width"] : 1}
+    stroke-opacity={data["stroke-opacity"] !== undefined ? data["stroke-opacity"] : 1}
   >
   </line>
 {/if}

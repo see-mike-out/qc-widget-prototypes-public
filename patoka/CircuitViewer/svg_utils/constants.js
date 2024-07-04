@@ -12,6 +12,9 @@ export const qubit_node_gap = 24;
 export const defualt_color = "#000000";
 export const default_fill = "#ffffff"
 
+export const esp_area_height = 70;
+export const esp_bar_width = 10;
+
 export const ord_colors = [
   "#4285f4",
   "#db4437",

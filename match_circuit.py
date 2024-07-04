@@ -162,7 +162,9 @@ def get_gate_components(gate_name, n_qubits, params, pass_manager):
         gate = gates.ZGate()
     # GlobalPhaseGate(phase[, label, duration, unit])	The global phase gate 
     elif gate_name == "global_phase": 
-        gate = gates.GlobalPhaseGate()    
+        gate = gates.GlobalPhaseGate()
+    elif gate_name == "QFT":
+        gate = gates.QFT(n_qubits).to_gate()
     if gate is not None:
         gate_transpiled = pass_manager.run(gate.definition)
         return gate_transpiled
@@ -272,6 +274,7 @@ def matchBitsFromTo(f_bit_list, used_bits, t):
 
 
 # circuit match
+# todo: fix seed
 
 def matchCircuitLayouts(origin, trans, pass_manager):
     # todo: need to come up with some dynamic programming method
