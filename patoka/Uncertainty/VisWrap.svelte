@@ -11,7 +11,8 @@
   import { format, select, selectAll } from "d3";
 
   export let data = writable(),
-    design = writable();
+    design = writable(),
+    id;
 
   let sizing = writable(),
     scales = writable();
@@ -70,6 +71,7 @@
     <div class="vis-wrap">
       {#if $sizing && $data && $design && $scales}
         <svg
+          {id}
           width={$sizing.width}
           height={$sizing.height}
           viewBox={$sizing.viewBox.join(" ")}
@@ -101,14 +103,14 @@
           {/if}
           <!-- axis -->
           <Axis
-            id="axis-x"
+            id={id + "-axis-x"}
             role="x_axis"
             {scales}
             sizing={$sizing}
             bootstrap={$data.metadata.bootstrap}
           ></Axis>
           <Axis
-            id="axis-y"
+            id={id + "-axis-y"}
             role="y_axis"
             {scales}
             sizing={$sizing}
@@ -116,14 +118,14 @@
           ></Axis>
           <!-- chart area -->
           <g
-            id="chart"
+            id={id + "-chart"}
             width={$sizing.chart.width}
             height={$sizing.chart.height}
             transform={`translate(${$sizing.chart.x} ${$sizing.chart.y})`}
           >
             {#each Object.keys($data.data) as state, i}
               <Dot
-                id={"mark-" + state.replace(/s/gi, "_") + "-true"}
+                id={id+"-mark-" + state.replace(/s/gi, "_") + "-true"}
                 index={i}
                 {state}
                 datum={$data.data[state]}
@@ -134,7 +136,7 @@
                 sizing={$sizing}
               ></Dot>
               <Dot
-                id={"mark-" + state.replace(/s/gi, "_") + "-hypo"}
+                id={id+"-mark-" + state.replace(/s/gi, "_") + "-hypo"}
                 index={i}
                 {state}
                 datum={$data.data[state]}
@@ -151,7 +153,7 @@
               ></Dot>
               {#if !$design.HOPS}
                 <Interval
-                  id={"interval-" + state.replace(/s/gi, "_")}
+                  id={id+"-interval-" + state.replace(/s/gi, "_")}
                   index={i}
                   {state}
                   datum={$data.data[state]}
@@ -163,7 +165,7 @@
                 ></Interval>
               {/if}
               <ClickWrap
-                id={"mark-" + state.replace(/s/gi, "_") + "-click"}
+                id={id+"-mark-" + state.replace(/s/gi, "_") + "-click"}
                 index={i}
                 {state}
                 datum={$data.data[state]}

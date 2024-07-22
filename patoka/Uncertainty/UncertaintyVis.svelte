@@ -22,7 +22,9 @@
     }
   });
 
+  let id;
   onMount(() => {
+    id = "uv-" + Number(new Date())
     data.set(vis_data);
     design.set(design_spec);
     model.on(event, callback);
@@ -46,6 +48,7 @@
           <li><strong>Sample size</strong>: {$data.metadata.sample_size}</li>
           <li><strong>CI %</strong>: {$data.metadata.ci_alpha}</li>
           <li><strong>Bootstrap?</strong>: {$data.metadata.bootstrap}</li>
+          <li><strong>Estimated Success Probability (ESP)</strong>: {$data.metadata.esp}</li>
           {#if $data.mean_sim_error}
             <li><strong>Mean simulation error</strong>: {$data.mean_sim_error}</li>
           {/if}
@@ -59,8 +62,8 @@
           <div>
             <input
               type="checkbox"
-              id="design-hops"
-              name="design-hops"
+              id={id + "-design-hops"}
+              name={id + "-design-hops"}
               checked={$design.HOPS}
               on:change={(e) => {
                 design.update((ds) => {
@@ -69,14 +72,14 @@
                 });
               }}
             />
-            <label for="design-hops">Use HOPS</label>
+            <label for={id + "-design-hops"}>Use HOPS</label>
           </div>
           {#if $design.HOPS}
             <div>
               <input
                 type="number"
-                id="design-hops-speed"
-                name="design-hops-speed"
+                id={id + "-design-hops-speed"}
+                name={id + "-design-hops-speed"}
                 value={$design.HOPS_speed}
                 by="1"
                 on:change={(e) => {
@@ -86,15 +89,15 @@
                   });
                 }}
               />
-              <label for="design-hops-speed">HOPS animation speed</label>
+              <label for={id + "-design-hops-speed"}>HOPS animation speed</label>
             </div>
           {/if}
           <div>
-            <label for="design-dir">Direction</label>
+            <label for={id + "-design-dir"}>Direction</label>
             <select
               type="checkbox"
-              id="design-dir"
-              name="design-dir"
+              id={id + "-design-dir"}
+              name={id + "-design-dir"}
               value={$design.direction}
               on:change={(e) => {
                 design.update((ds) => {
@@ -119,7 +122,7 @@
   </section>
   <section class="content">
     {#key design}
-      <VisWrap {data} {design}></VisWrap>
+      <VisWrap {id} {data} {design}></VisWrap>
     {/key}
   </section>
 </div>

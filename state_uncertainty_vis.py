@@ -139,7 +139,8 @@ def drawStateUncertainty(job, trans_circuit, sampling_counts=None, sample_size=N
         "sampling_counts": sampling_counts, 
         "ci_alpha": ci_alpha,
         "bootstrap": bootstrap,
-        "sample_size": sample_size
+        "sample_size": sample_size,
+        "esp": esp
     }
     return resample_vis(resample_stats, resample_count_values, resample_prob_values, sim_errors, metadata, design)
 
@@ -216,7 +217,8 @@ def count_adjustment(counts):
     key_split = init_key.split(" ")
     size = len(key_split[0])
     possible_states = [np.binary_repr(x, width=size) for x in np.arange(pow(2, size))]
-    possible_states = [x + " " + " ".join(key_split[1:]) for x in possible_states]
+    if len(key_split) > 1:
+        possible_states = [x + " " + " ".join(key_split[1:]) for x in possible_states]
     for state in possible_states:
         if state not in counts:
             counts[state] = 0
