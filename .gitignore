@@ -162,3 +162,4 @@ cython_debug/
 #.idea/
 
 testing/
+node_modules/
