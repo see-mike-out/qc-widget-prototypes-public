@@ -4,7 +4,6 @@ import MachineViewer from "./patoka/MachineViewer/MachineViewer.svelte";
 import UncertaintyVis from "./patoka/Uncertainty/UncertaintyVis.svelte";
 
 export function render({ model, el }) {
-    
     if (model.get("mode") === "view") {
     	let view = new CircuitViewer({ target: el, props: { model } });
     	return () => view.$destroy();

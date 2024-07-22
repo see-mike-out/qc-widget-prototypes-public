@@ -2,7 +2,14 @@
 
 ## Environment setups
 
-conda create -n patoka -c conda-forge jupyterlab nodejs yarn python
+1. Create an environment and install requirements
+`conda create --name patoka --file requirements.txt`
 
-conda activate patoka
+2. Activate the environment
+`conda activate patoka`
 
+3. Install node.js packages
+`npm install`
+
+4. To use the prototypes, run a node server
+`npm run dev`

@@ -6,12 +6,18 @@ from backend_design import get_backend_circuit_nodes
 import json
 
 def getMachineMetaInfo(backend):
-    name = backend.properties().backend_name
-    is_simulator = backend.configuration().simulator
-    return {
-        "name": backend.name,
-        "is_simulator": is_simulator
+    if backend.name == 'aer_simulator':
+        return {
+            "name": "Aer",
+            "is_simulator": True
     }
+    else:
+        name = backend.properties().backend_name
+        is_simulator = backend.configuration().simulator
+        return {
+            "name": backend.name,
+            "is_simulator": is_simulator
+        }
 
 def getMachineInformation(backend):
     calltime = timeToStr(datetime.datetime.now())

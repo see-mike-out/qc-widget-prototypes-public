@@ -72,50 +72,17 @@
 
       output_code.set(convertToQiskitCode(d));
 
+    });
+
+    output_code.subscribe((code) => {
       // output
-      model.set(key_circ, $output_code);
+      model.set(key_circ, code);
       model.save_changes();
     });
 
     data.set({
-      is_simulator: true,
-      machine: "Aer",
-      machine_qubits: Infinity,
-      num_qubits: 12,
-      qubits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-      num_clbits: 8,
-      clbits: [0, 1, 2, 3, 4, 5, 6, 7],
-      num_operations: 1,
-      operations: [
-        {
-          operation_def: "SHOR_period",
-          apply_to: [0, 1],
-          apply_all: false,
-          qubit_registers: {
-            oracle: {
-              apply_all: false,
-              apply_to: [8, 9, 10, 11],
-            },
-            counter: {
-              apply_all: false,
-              apply_to: [0, 1, 2, 3, 4, 5, 6, 7],
-            },
-          },
-          params: {
-            divider: 15,
-            factor: 2,
-          },
-        },
-      ],
-      measure: [1, 0, 2, 4, 3, 5, 6, 7],
-      measure_all: false,
-      num_pauli_obs: 0,
-      pauli_obs: [],
-      use_pauli_obs: false,
-      reporting: "measure",
-      no_machine: false,
-      no_sim: false,
-      sim_not_choosable: false,
+      machine: machine_info?.name,
+      is_simulator: machine_info?.is_simulator
     });
     model.on(event, callback);
   });
