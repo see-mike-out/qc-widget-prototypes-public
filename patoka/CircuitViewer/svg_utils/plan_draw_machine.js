@@ -324,6 +324,8 @@ export function planMachineView(data, operation_data, config) {
     });
 
     cumul_esp_data[lcnt] = cumul_esp_data[lcnt - 1] || 1;
+
+    let kx = layer_data.operations.length;
     for (const op_data of layer_data.operations) {
       let gate_info = data.gate_info.filter((d) =>
         bit_order_match(op_data.qubits.map(e => e.index), d?.qubits) &&
@@ -359,7 +361,9 @@ export function planMachineView(data, operation_data, config) {
       let layer_match = get_original_layer(config?.match?.layer_match, "t-o", lcnt, ocnt);
       if (layer_match) {
         match_color =
-          ord_colors[(layer_match.layer + layer_match.operation * 10) % ord_colors.length];
+          ord_colors[(layer_match.layer + layer_match.operation * kx) % ord_colors.length];
+      } else {
+        match_color = "#454545"
       }
 
       let op = {

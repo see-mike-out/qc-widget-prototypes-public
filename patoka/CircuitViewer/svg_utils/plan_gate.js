@@ -6,6 +6,7 @@ import { RZ } from "./gates/rz";
 import { SX } from "./gates/sx";
 import { CUSTOM } from "./gates/custom";
 import { BARRIER } from "./gates/barrier";
+import { H } from "./gates/h";
 
 
 export const gate_data = {
@@ -44,6 +45,14 @@ export function planGateDrawing(op, layer_index) {
     output = MEASURE.plan(op, layer_index);
   } else if (op.gate === RZ.name) {
     output = RZ.plan(op, layer_index);
+  }
+
+  // ++++++ single-qubit (boxed)
+  // HGate(*args[, _force_mutable])	Single-qubit Hadamard gate.
+  // h + 1 qubit (H)
+
+  else if (op.gate === H.name) {
+    output = H.plan(op, layer_index);
   } else if (op.gate === SX.name) {
     output = SX.plan(op, layer_index);
   } else if (op.gate === CX.name) {
@@ -213,9 +222,6 @@ export function planGateDrawing(op, layer_index) {
 // u3 + 1 qubit + 3 params
 
 // ++++++ single-qubit (boxed)
-// HGate(*args[, _force_mutable])	Single-qubit Hadamard gate.
-// h + 1 qubit (H)
-
 // IGate(*args[, _force_mutable])	Identity gate.
 // id + 1 qubit (I)
 

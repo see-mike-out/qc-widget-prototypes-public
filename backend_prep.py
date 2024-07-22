@@ -1,4 +1,5 @@
 import json 
+from backend_design import get_backend_circuit_nodes
 
 def getBackendData(backend):
     # meta data
@@ -58,19 +59,6 @@ def getBackendData(backend):
         "gate_info": gate_info
     }
 
-
-def get_backend_circuit_nodes(name):
-    if name == "ibmq_vigo":
-        return NODES_IMBQ_VIGO
-
-
-NODES_IMBQ_VIGO = [
-    {"index": 0, "x": 0, "y": 0},
-    {"index": 1, "x": 1, "y": 0},
-    {"index": 2, "x": 2, "y": 0},
-    {"index": 3, "x": 1, "y": 1},
-    {"index": 4, "x": 1, "y": 2}
-]
 
 def timeToStr(dt):
     return dt.strftime("%m/%d/%Y, %H:%M:%S")

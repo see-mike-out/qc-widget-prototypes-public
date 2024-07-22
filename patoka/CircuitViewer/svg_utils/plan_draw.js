@@ -188,6 +188,7 @@ export function planDrawing(data, config) {
 
     // per gate
     let layer_width = 0;
+    let kx = layer.operations.length;
     for (let j = 0; j < layer.operations.length; j++) {
       let op = layer.operations[j]
       let op_plan = planGateDrawing(op, i);
@@ -196,12 +197,12 @@ export function planDrawing(data, config) {
       let layer_match, match_color;
       if (config?.is_original) {
         layer_match = get_original_layer(config?.match?.layer_match, "o-t", i, j);
-        match_color = ord_colors[(i + j * 10) % ord_colors.length];
+        match_color = ord_colors[(i + j * kx) % ord_colors.length];
       } else {
         layer_match = get_original_layer(config?.match?.layer_match, "t-o", i, j);
         if (layer_match)
           match_color =
-            ord_colors[(layer_match.layer + layer_match.operation * 10) % ord_colors.length];
+            ord_colors[(layer_match.layer + layer_match.operation * kx) % ord_colors.length];
       }
 
       if (op_plan) {

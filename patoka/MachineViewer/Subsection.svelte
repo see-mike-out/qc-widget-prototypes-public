@@ -1,0 +1,125 @@
+<script>
+  import { writable } from "svelte/store";
+  import Title from "./Title.svelte";
+  import Panel from "./Panel.svelte";
+  import { titles } from "./meta_info";
+  import NudvMapPanel from "./NudvMapPanel.svelte";
+  import GatesPanel from "./GatesPanel.svelte";
+  import GenQubitPanel from "./GenQubitPanel.svelte";
+  import QubitListPanel from "./QubitListPanel.svelte";
+  import CircuitViewPanel from "./CircuitViewPanel.svelte";
+
+  export let data = writable();
+  export let addToBasket = () => {};
+  export let basket;
+  export let section_meta;
+  let hide = false;
+  function toggleSection() {
+    hide = !hide;
+  }
+</script>
+
+{#if $data && section_meta}
+  <section>
+    <Title title={titles[section_meta.key]} {toggleSection} {hide} level={2}
+    ></Title>
+    {#if !hide}
+      <div class="panel">
+        {#each section_meta?.order as sub}
+          {#if sub === "general"}
+            <NudvMapPanel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              {addToBasket}
+              {basket}
+              code_header="backend.properties().general["
+              code_footer="]"
+            ></NudvMapPanel>
+          {:else if sub === "gates"}
+            <GatesPanel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              {addToBasket}
+              {basket}
+              code_header="backend.properties().gates["
+              code_footer="].to_dict()"
+            ></GatesPanel>
+          {:else if sub === "general_qlists"}
+            <GenQubitPanel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              {addToBasket}
+              {basket}
+              code_header="backend.properties().general_qlists["
+              code_footer="]"
+            ></GenQubitPanel>
+          {:else if sub === "qubits"}
+            <QubitListPanel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              {addToBasket}
+              {basket}
+              code_header="[item.to_dict for item in backend.properties().qubits["
+              code_footer="]]"
+            ></QubitListPanel>
+          {:else if sub === "faulty_qubits"}
+            <Panel
+              key={sub}
+              value={$data[section_meta.key][sub].join(", ")}
+              level={2}
+              {addToBasket}
+              {basket}
+            ></Panel>
+          {:else if sub === "faulty_gates"}
+            <GatesPanel key={sub} value={$data[section_meta.key][sub]} level={2}
+            ></GatesPanel>
+          {:else if sub === "circuit_view"}
+            <CircuitViewPanel
+              key={sub}
+              qubit_edges={$data[section_meta.key].edges}
+              qubit_nodes={$data.circuit_nodes}
+              qubit_index={$data[section_meta.key].nodes}
+              qubit_info={$data.properties.qubits}
+              gate_info={$data.properties.gates}
+              level={2}
+              {addToBasket}
+              {basket}
+            ></CircuitViewPanel>
+          {:else}
+            <Panel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              {addToBasket}
+              {basket}
+            ></Panel>
+          {/if}
+        {/each}
+      </div>
+    {/if}
+  </section>
+{/if}
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: sans-serif;
+    line-height: 100%;
+  }
+  section {
+    width: 100%;
+    padding: 1rem 0 0rem 0;
+    /* border-top: 1px solid #ddd;
+    margin-top: 1rem; */
+  }
+  .panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 1rem;
+    row-gap: 1rem;
+  }
+</style>
