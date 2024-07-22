@@ -38,12 +38,12 @@ export const sections = [
         "key": "properties",
         "order": [
           "last_update_date",
+          "general_qlists",
           "general",
           "gates",
           "qubits",
-          "general_qlists",
+          "faulty_gates",
           "faulty_qubits",
-          "faulty_gates"
         ]
       }
     ]
@@ -56,10 +56,10 @@ export const sections = [
         "key": "coupling_map",
         "order": [
           // "size",
-          // "distance_matrix",
           // "nodes",
           // "edges",
           "circuit_view",
+          "distance_matrix",
           "is_symmetric"
         ]
       }
@@ -72,7 +72,6 @@ export const sections = [
   {
     "title": "Instructions",
     "subsections": ["instructions"]
-    // , "instruction_durations", "instruction_schedule_map"] 
   },
   {
     "title": "Pulse-related",
@@ -198,9 +197,7 @@ export const descriptions = {
   "operations": "Operations supported by the machine",
 
   // Instructions
-  "instructions": "Instructions supported for each qubit",
-  "instruction_durations": "The durations of the supported instructions (= operations)",
-  "instruction_schedule_map": "Schedule information for implementing the supported instructions (= operations), often seen as gate calibrations.",
+  "instructions": "Instructions supported for each qubit.",
 
   // Pulse-related inforamation
   "pulse_defaults": "the pulse defaults for the backend. If `None`, the machine is not available for Pulse scheduling.",
@@ -260,32 +257,29 @@ export const markers = {
   "faulty_gates": "back1.properties().faulty_gates()",
 
   // Qubits
-  "coupling_map": "Coupling map",
-  "size": "Size",
-  "distance_matrix": "Distance matrix",
-  "nodes": "Nodes",
-  "edges": "Edges",
-  "is_symmetric": "Is symmetric?",
-  "num_qubits": "Number of qubits",
+  "coupling_map": "backend.coupling_map",
+  "size": "backend.coupling_map.coupling_map.size()",
+  "distance_matrix": "backend.coupling_map.distance_matrix",
+  "is_symmetric": "backend.coupling_map.is_symmetric",
+  "num_qubits": "backend.num_qubits",
 
   // Operations
-  "operation_names": "Operation names",
-  "operations": "Operations",
+  "operation_names": "backend.operation_names",
+  "operations": "backend.operations",
 
   // Instructions
-  "instructions": "Instructions",
+  "instructions": "backend.instructions",
   "instruction_durations": "Instruciton durationas",
   "instruction_schedule_map": "Instruction schedule map",
 
   // Pulse-related inforamation
-  "pulse_defaults": "Pulse defaults",
-  "qubit_freq_est": "Qubit frequencies in Hertz",
-  "meas_freq_est": "Measurement frequencies in Hertz",
-  "meas_map": "Measurement groupings",
-  "input_time_resolution": "Input time resolution",
-  "output_time_resolution": "Output time resolutin",
+  "pulse_defaults": "backend.defaults()",
+  "qubit_freq_est": "backend.defaults().qubit_freq_est",
+  "meas_freq_est": "backend.defaults().meas_freq_est",
+  "meas_map": "backend.meas_map",
+  "input_time_resolution": "backend.dt",
+  "output_time_resolution": "backend.dtm",
 
   // Compiler-related information
-  "target": "Target",
-  "translation_stage_plugin": "Translation stage plugin(s)",
+  "translation_stage_plugin": "translation_stage_plugin = backend.get_translation_stage_plugin() if hasattr(backend, 'get_translation_stage_plugin') else None",
 }

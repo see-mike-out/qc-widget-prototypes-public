@@ -8,7 +8,6 @@
     level = 1,
     code_header = "",
     code_footer = "";
-  console.log(key, value);
 </script>
 
 <article>
@@ -61,6 +60,7 @@
     border: 1px solid #aaa;
     background-color: #fafafa;
     box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.15);
+    grid-column: span 4;
   }
   .basket {
     position: absolute;
@@ -94,7 +94,7 @@
     margin: 0 0 0.5rem 0;
   }
   .value {
-    font-family: iosevka;
+    font-family: var(--font-mono);
     font-size: 1.1rem;
   }
   .desc {

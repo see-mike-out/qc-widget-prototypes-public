@@ -54,7 +54,7 @@
     margin: 0 0 0.5rem 0;
   }
   .value {
-    font-family: iosevka;
+    font-family: var(--font-mono);
     font-size: 1.1rem;
   }
   .desc {

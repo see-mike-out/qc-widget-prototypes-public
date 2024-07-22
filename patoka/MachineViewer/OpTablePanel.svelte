@@ -1,13 +1,13 @@
 <script>
+  import { onMount } from "svelte";
   import Cart from "./Cart.svelte";
   import { titles, descriptions, markers } from "./meta_info";
   export let key = "",
-    value,
+    value = [],
     addToBasket,
     basket,
     level = 1,
     code_header = "",
-    code_type = "",
     code_footer = "";
 </script>
 
@@ -27,44 +27,52 @@
   {:else if level == 2}
     <h3>{titles[key]}</h3>
   {/if}
-  <div class="value">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Value</th>
-          <th>Unit</th>
-          <th>As of</th>
-          <th>-</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each Object.keys(value) as key, ki}
+  <div class="content-wrap">
+    <div class="value">
+      <table>
+        <thead>
           <tr>
-            <th>{key}</th><td>{value[key].value}</td><td>{value[key].unit}</td
-            ><td>{value[key].asof}</td>
-            <td>
-              {#if addToBasket}
-                <button
-                  class="basket"
-                  on:click={() => {
-                    addToBasket(
-                      `${key}_${ki} = ${code_header}${key}${code_footer}`,
-                    );
-                  }}
-                >
-                  <Cart
-                    on={$basket.includes(
-                      `${key}_${ki} = ${code_header}${key}${code_footer}`,
-                    )}
-                  ></Cart>
-                </button>
-              {/if}
-            </td>
+            <th>Name</th>
+            <th>Type</th>
+            <th>#Qubits</th>
+            <th>#ClBits</th>
+            <th>Params</th>
+            <th>Mutable?</th>
+            <th>-</th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {#each value as gate, gi}
+            <tr>
+              <th>{gate.name}</th>
+              <td>{gate.type}</td>
+              <td>{gate.num_qubits || ""}</td>
+              <td>{gate.num_clbits || ""}</td>
+              <td>{gate.params?.join(", ") || ""}</td>
+              <td>{gate.mutable || ""}</td>
+              <th>
+                {#if addToBasket}
+                  <button
+                    class="basket"
+                    on:click={() => {
+                      addToBasket(
+                        `op_${key}_${gate.name} = ${code_header}${gate.name}${code_footer}`,
+                      );
+                    }}
+                  >
+                    <Cart
+                      on={$basket.includes(
+                        `op_${key}_${gate.name} = ${code_header}${gate.name}${code_footer}`,
+                      )}
+                    ></Cart>
+                  </button>
+                {/if}
+              </th>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
   </div>
   {#if descriptions[key]}
     <div class="desc">{descriptions[key]}</div>

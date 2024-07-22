@@ -18,7 +18,8 @@
     qubits = [];
   onMount(() => {
     if (value) {
-      gates = Array.from(new Set(value.map((d) => d.gate)));
+      console.log(value);
+      gates = Array.from(new Set(value.map((d) => d.name)));
       qubits = Array.from(new Set(value.map((d) => d.qubits).flat()));
     }
   });
@@ -97,35 +98,39 @@
           <tr>
             <th>Gate</th>
             <th>Qubits</th>
-            <th>Error</th>
-            <th>Length</th>
+            <th>#Qubits</th>
+            <th>#Clbits</th>
+            <th>Duration</th>
+            <th>Mutable?</th>
+            <th>Params</th>
             <th>-</th>
           </tr>
         </thead>
         <tbody>
           {#each value as gate, gi}
-            {#if (!filter.gates || filter.gates.length == 0 || (filter.gates && filter.gates.includes(gate.gate))) && (!filter.qubits || filter.qubits.length == 0 || (filter.qubits && gate.qubits.some( (q) => filter.qubits.includes(q), )))}
+            {#if (!filter.gates || filter.gates.length == 0 || (filter.gates && filter.gates.includes(gate.name))) && (!filter.qubits || filter.qubits.length == 0 || (filter.qubits && gate.qubits.some( (q) => filter.qubits.includes(q), )))}
               <tr>
-                <th>{gate.gate}</th>
-                <td>{gate.qubits.join(",")}</td>
-                <td>{gate.parameters.gate_error?.value}</td>
-                <td
-                  >{gate.parameters.gate_length.value} ({gate.parameters
-                    .gate_length.unit})</td
-                >
+                <th>{gate.name}</th>
+                <td>{gate.qubits?.join(", ") || ""}</td>
+                <td>{gate.num_qubits || ""}</td>
+                <td>{gate.num_clbits || ""}</td>
+                <td>{gate.duration || ""}</td>
+                <td>{gate.mutable || ""}</td>
+                <td>{gate.params?.join(", ") || ""}</td>
+
                 <td>
                   {#if addToBasket}
                     <button
                       class="basket"
                       on:click={() => {
                         addToBasket(
-                          `gate_${gate.name} = ${code_header}gate=${gate.gate}, qubits=[${gate.qubits.join(", ")}]${code_footer}`,
+                          `instruction_${gate.name}_${gate.qubits?.join(", ")} = ${code_header}x.name == "${gate.name}" and x.qubits == [${gate.qubits?.join(", ")}]${code_footer}`,
                         );
                       }}
                     >
                       <Cart
                         on={$basket.includes(
-                          `gate_${gate.name} = ${code_header}gate=${gate.gate}, qubits=[${gate.qubits.join(", ")}]${code_footer}`,
+                          `instruction_${gate.name}_${gate.qubits?.join(", ")} = ${code_header}x.name == "${gate.name}" and x.qubits == [${gate.qubits?.join(", ")}]${code_footer}`,
                         )}
                       ></Cart>
                     </button>
@@ -150,7 +155,7 @@
     border: 1px solid #aaa;
     background-color: #fafafa;
     box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.15);
-    grid-column: span 3;
+    grid-column: span 6;
   }
   .basket {
     position: absolute;

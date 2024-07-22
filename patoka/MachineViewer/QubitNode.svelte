@@ -16,6 +16,8 @@
 </script>
 
 {#if qubit !== undefined && qubit_node}
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <node
     id={"qubit-" + qubit}
     class="circuit-element"
@@ -28,21 +30,25 @@
     padding-top: ${qubit_radius * 0.225}px;
     background-color: ${colorScale(qubit_info_value.value)};
     color: ${decideBlackWhite(colorScale(qubit_info_value.value))}`}
-    on:mouseover={(e) => {
+    on:focus={(e) => {
       openTooltip(
         e,
         "Qubit " + qubit,
         qubit_info_selected,
         qubit_info_value,
         "qubit-" + qubit,
-        [qubit]
+        [qubit],
       );
     }}
-    on:mousemove={(e) => {
-      moveTooltip(e);
-    }}
-    on:mouseout={(e) => {
-      hideTooltip();
+    on:click={(e) => {
+      openTooltip(
+        e,
+        "Qubit " + qubit,
+        qubit_info_selected,
+        qubit_info_value,
+        "qubit-" + qubit,
+        [qubit],
+      );
     }}>{qubit}</node
   >
 {/if}
@@ -53,10 +59,13 @@
     display: block;
     position: absolute;
     background-color: lightgray;
-    font-family: iosevka;
+    font-family: var(--font-mono);
     text-align: center;
     line-height: 100%;
     border: 1px solid white;
     user-select: none;
+  }
+  node:hover {
+    outline: 2px solid black;
   }
 </style>

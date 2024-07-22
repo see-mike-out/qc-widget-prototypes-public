@@ -19,7 +19,7 @@ export function makeCode(basket_data) {
     code += `        "${key}": ${key},`
     code += "\n"
   }
-  code += "\n    }\n"
+  code += "    }\n"
   code += "    return output"
   return code
 }

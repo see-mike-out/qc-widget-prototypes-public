@@ -16,7 +16,7 @@
 {#if edge && edge_nodes}
   {#if edge_nodes[0]?.x == edge_nodes[1]?.x}
     <!-- vertical -->
-    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <edge
       id={"edge-" + edge.join("-")}
@@ -26,26 +26,30 @@
       height: ${Math.abs(edge_nodes[0]?.y - edge_nodes[1]?.y) * qubit_gap}px;
       left: ${padding * 2 + edge_nodes[0]?.x * qubit_gap - edge_width / 2}px;
       background-color: ${colorScale(edge_info_value?.value)};`}
-      on:mouseover={(e) => {
+      on:click={(e) => {
         openTooltip(
           e,
           "Edge " + edge.join("-"),
           edge_info_selected,
           edge_info_value,
           "edge-" + edge.join("-"),
-          edge
+          edge,
         );
       }}
-      on:mousemove={(e) => {
-        moveTooltip(e);
-      }}
-      on:mouseout={(e) => {
-        hideTooltip();
+      on:focus={(e) => {
+        openTooltip(
+          e,
+          "Edge " + edge.join("-"),
+          edge_info_selected,
+          edge_info_value,
+          "edge-" + edge.join("-"),
+          edge,
+        );
       }}
     ></edge>
   {:else}
     <!-- horizontal -->
-    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <edge
       id={"edge-" + edge.join("-")}
@@ -55,21 +59,25 @@
       width: ${Math.abs(edge_nodes[0]?.x - edge_nodes[1]?.x) * qubit_gap}px; 
       left: ${padding * 2 + edge_nodes[0]?.x * qubit_gap}px;
       background-color: ${colorScale(edge_info_value?.value)};`}
-      on:mouseover={(e) => {
+      on:click={(e) => {
         openTooltip(
           e,
           "Edge " + edge.join("-"),
           edge_info_selected,
           edge_info_value,
           "edge-" + edge.join("-"),
-          edge
+          edge,
         );
       }}
-      on:mousemove={(e) => {
-        moveTooltip(e);
-      }}
-      on:mouseout={(e) => {
-        hideTooltip();
+      on:focus={(e) => {
+        openTooltip(
+          e,
+          "Edge " + edge.join("-"),
+          edge_info_selected,
+          edge_info_value,
+          "edge-" + edge.join("-"),
+          edge,
+        );
       }}
     >
     </edge>
@@ -85,5 +93,8 @@
     font-size: 0.4rem;
     color: white;
     border: 1px solid white;
+  }
+  edge:hover {
+    outline: 2px solid black;
   }
 </style>

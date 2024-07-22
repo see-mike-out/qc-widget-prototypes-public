@@ -3,12 +3,14 @@
   import Title from "./Title.svelte";
   import Panel from "./Panel.svelte";
   import Subsection from "./Subsection.svelte";
+  import OpTablePanel from "./OpTablePanel.svelte";
+  import InstructionsPanel from "./InstructionsPanel.svelte";
 
   export let data = writable();
   export let addToBasket = () => {};
   export let basket;
   export let section_meta;
-  let hide = false;
+  export let hide = false;
   function toggleSection() {
     hide = !hide;
   }
@@ -23,6 +25,26 @@
           <!-- special cases -->
           {#if sub === "asof"}
             <Panel key={sub} value={$data[sub]} level={1}></Panel>
+          {:else if sub === "operations"}
+            <OpTablePanel
+              key={sub}
+              value={$data[sub]}
+              level={1}
+              {addToBasket}
+              {basket}
+              code_header={`list(fliter(lambda x: x.name == "`}
+              code_footer={`", backend.operations))[0]`}
+            ></OpTablePanel>
+          {:else if sub === "instructions"}
+            <InstructionsPanel
+              key={sub}
+              value={$data[sub]}
+              level={1}
+              {addToBasket}
+              {basket}
+              code_header={`list(fliter(lambda x: `}
+              code_footer={`, backend.operations))[0]`}
+            ></InstructionsPanel>
           {:else if !sub.key}
             <Panel key={sub} value={$data[sub]} level={1} {addToBasket} {basket}
             ></Panel>
@@ -52,7 +74,7 @@
   }
   .panel {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
     column-gap: 1rem;
     row-gap: 1rem;
   }

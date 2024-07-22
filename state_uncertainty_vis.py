@@ -54,7 +54,6 @@ def drawStateUncertainty(job, trans_circuit, sampling_counts=None, sample_size=N
     if sample_size is None:
         sample_size = n_shots
     if sample_size < n_shots:
-        print("?")
         bootstrap = True
 
     # resample
@@ -93,6 +92,13 @@ def drawStateUncertainty(job, trans_circuit, sampling_counts=None, sample_size=N
             re_count_dict[re_values[i]] = int(re_counts[i])
         resample_count_collection.append(re_count_dict)
 
+    sim_errors = None
+    if sample_size == n_shots:
+        sim_errors = []
+        for rs in resample_collection:
+            sim_err = np.sum(rs == original_sample)
+            sim_errors.append(float(sim_err) / n_shots)
+            
     # get confidence interval
     resample_stats = {}
     resample_count_values = {}
@@ -135,16 +141,17 @@ def drawStateUncertainty(job, trans_circuit, sampling_counts=None, sample_size=N
         "bootstrap": bootstrap,
         "sample_size": sample_size
     }
-    return resample_vis(resample_stats, resample_count_values, resample_prob_values, metadata, design)
+    return resample_vis(resample_stats, resample_count_values, resample_prob_values, sim_errors, metadata, design)
 
 
 class resample_vis:
-    def __init__(self, stats, counts, probs, metadata, design):
+    def __init__(self, stats, counts, probs, sim_errors, metadata, design):
         self.stats = stats
         self.counts = counts
         self.probs = probs
         self.metadata = metadata
         self.design = design
+        self.sim_errors = sim_errors
     
     def draw(self, mark=None):
         if mark is None and "mark" in self.design:
@@ -176,6 +183,8 @@ class resample_vis:
             "data": self.stats,
             "counts": self.counts,
             "probs": self.probs,
+            "sim_error": self.sim_errors,
+            "mean_sim_error": float(np.mean(self.sim_errors)) if self.sim_errors is not None else None,
             "metadata": self.metadata
         })
 

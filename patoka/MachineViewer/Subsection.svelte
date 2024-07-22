@@ -8,6 +8,8 @@
   import GenQubitPanel from "./GenQubitPanel.svelte";
   import QubitListPanel from "./QubitListPanel.svelte";
   import CircuitViewPanel from "./CircuitViewPanel.svelte";
+  import MatrixPanel from "./MatrixPanel.svelte";
+  import QubitFreqPanel from "./QubitFreqPanel.svelte";
 
   export let data = writable();
   export let addToBasket = () => {};
@@ -33,8 +35,8 @@
               level={2}
               {addToBasket}
               {basket}
-              code_header="backend.properties().general["
-              code_footer="]"
+              code_header={`list(fliter(lambda x: x.name == "`}
+              code_footer={`", backend.properties().general))[0]`}
             ></NudvMapPanel>
           {:else if sub === "gates"}
             <GatesPanel
@@ -43,8 +45,8 @@
               level={2}
               {addToBasket}
               {basket}
-              code_header="backend.properties().gates["
-              code_footer="].to_dict()"
+              code_header={`backend.properties().gate_property(`}
+              code_footer={`)`}
             ></GatesPanel>
           {:else if sub === "general_qlists"}
             <GenQubitPanel
@@ -63,8 +65,8 @@
               level={2}
               {addToBasket}
               {basket}
-              code_header="[item.to_dict for item in backend.properties().qubits["
-              code_footer="]]"
+              code_header="backend.properties().qubit_property("
+              code_footer=")"
             ></QubitListPanel>
           {:else if sub === "faulty_qubits"}
             <Panel
@@ -89,6 +91,34 @@
               {addToBasket}
               {basket}
             ></CircuitViewPanel>
+          {:else if sub === "distance_matrix"}
+            <MatrixPanel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              {addToBasket}
+              {basket}
+            ></MatrixPanel>
+          {:else if sub === "qubit_freq_est"}
+            <QubitFreqPanel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              code_header="backend.defaults().qubit_freq_est["
+              code_footer="]"
+              {addToBasket}
+              {basket}
+            ></QubitFreqPanel>
+          {:else if sub === "meas_freq_est"}
+            <QubitFreqPanel
+              key={sub}
+              value={$data[section_meta.key][sub]}
+              level={2}
+              code_header="backend.defaults().meas_freq_est["
+              code_footer="]"
+              {addToBasket}
+              {basket}
+            ></QubitFreqPanel>
           {:else}
             <Panel
               key={sub}
@@ -118,7 +148,7 @@
   }
   .panel {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
     column-gap: 1rem;
     row-gap: 1rem;
   }

@@ -252,56 +252,184 @@
           <tr>
             <th>{qubit.index.value}</th>
             <td
-              >{qubit.T1.value}<br /><span class="asof">({qubit.T1.asof})</span
-              ></td
+              >{qubit.T1.value}<br /><span class="asof">({qubit.T1.asof})</span>
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_T1= ${code_header}${qi}, name="T1"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_T1 = ${code_header}${qi}, name="T1"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}</td
             >
             <td
-              >{qubit.T2.value}<br /><span class="asof">({qubit.T2.asof})</span
-              ></td
+              >{qubit.T2.value}<br /><span class="asof">({qubit.T2.asof})</span>
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_T2= ${code_header}${qi}, name="T2"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_T2 = ${code_header}${qi}, name="T2"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}</td
             >
             <td
               >{qubit.anharmonicity.value}<br /><span class="asof"
                 >({qubit.anharmonicity.asof})</span
-              ></td
+              >
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_anharmonicity= ${code_header}${qi}, name="anharmonicity"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_anharmonicity = ${code_header}${qi}, name="anharmonicity"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}</td
             >
             <td
               >{qubit.frequency.value}<br /><span class="asof"
                 >({qubit.frequency.asof})</span
-              ></td
+              >
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_frequency= ${code_header}${qi}, name="frequency"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_frequency = ${code_header}${qi}, name="frequency"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}</td
             >
             <td
               >{qubit.prob_meas0_prep1.value}<br /><span class="asof"
                 >({qubit.prob_meas0_prep1.asof})</span
-              ></td
+              >
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_prob_meas0_prep1= ${code_header}${qi}, name="prob_meas0_prep1"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_prob_meas0_prep1 = ${code_header}${qi}, name="prob_meas0_prep1"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}</td
             >
             <td
               >{qubit.prob_meas1_prep0.value}<br /><span class="asof"
                 >({qubit.prob_meas1_prep0.asof})</span
-              ></td
+              >
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_prob_meas1_prep0= ${code_header}${qi}, name="prob_meas1_prep0"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_prob_meas1_prep0 = ${code_header}${qi}, name="prob_meas1_prep0"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}</td
             >
             <td
               >{qubit.readout_error.value}<br /><span class="asof"
                 >({qubit.readout_error.asof})</span
-              ></td
-            >
+              >
+
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_readout_error = ${code_header}${qi}, name="readout_error"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_readout_error = ${code_header}${qi}, name="readout_error"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}
+            </td>
             <td
               >{qubit.readout_length.value}<br /><span class="asof"
                 >({qubit.readout_length.asof})</span
-              ></td
-            >
+              >
+
+              {#if addToBasket}
+                <button
+                  class="basket"
+                  on:click={() => {
+                    addToBasket(
+                      `qubit_${key}_${qi}_readout_length = ${code_header}${qi}, name="readout_length"${code_footer}`,
+                    );
+                  }}
+                >
+                  <Cart
+                    on={$basket.includes(
+                      `qubit_${key}_${qi}_readout_length = ${code_header}${qi}, name="readout_length"${code_footer}`,
+                    )}
+                  ></Cart>
+                </button>
+              {/if}
+            </td>
             <td>
               {#if addToBasket}
                 <button
                   class="basket"
                   on:click={() => {
                     addToBasket(
-                      `${key}_${qi} = ${code_header}${qi}${code_footer}`,
+                      `qubit_${key}_${qi} = ${code_header}${qi}${code_footer}`,
                     );
                   }}
                 >
                   <Cart
                     on={$basket.includes(
-                      `${key}_${qi} = ${code_header}${qi}${code_footer}`,
+                      `qubit_${key}_${qi} = ${code_header}${qi}${code_footer}`,
                     )}
                   ></Cart>
                 </button>
@@ -324,7 +452,7 @@
     border: 1px solid #aaa;
     background-color: #fafafa;
     box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.15);
-    grid-column: 1/4;
+    grid-column: span 6;
   }
   .basket {
     position: absolute;
@@ -358,9 +486,9 @@
     margin: 0 0 0.5rem 0;
   }
   .value {
-    font-family: iosevka;
+    font-family: var(--font-mono);
     font-size: 1.1rem;
-    max-height: 200px;
+    max-height: 400px;
     overflow-y: scroll;
   }
   .desc {
@@ -377,10 +505,19 @@
     border: 1px solid #ddd;
     padding: 0.25rem 0.1rem;
   }
+  table td {
+    min-width: 130px;
+  }
   thead th {
     background-color: white;
     position: sticky;
     top: -1px;
+  }
+  tbody th {
+    min-width: 30px;
+    background-color: white;
+    position: sticky;
+    left: 0;
   }
   .asof {
     color: #999;
@@ -397,5 +534,8 @@
   }
   th button:hover {
     background-color: rgba(0, 0, 0, 0.15);
+  }
+  td span {
+    display: block;
   }
 </style>

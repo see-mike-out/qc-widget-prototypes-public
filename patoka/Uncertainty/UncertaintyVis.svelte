@@ -46,6 +46,9 @@
           <li><strong>Sample size</strong>: {$data.metadata.sample_size}</li>
           <li><strong>CI %</strong>: {$data.metadata.ci_alpha}</li>
           <li><strong>Bootstrap?</strong>: {$data.metadata.bootstrap}</li>
+          {#if $data.mean_sim_error}
+            <li><strong>Mean simulation error</strong>: {$data.mean_sim_error}</li>
+          {/if}
         </ul>
       </div>
     {/if}

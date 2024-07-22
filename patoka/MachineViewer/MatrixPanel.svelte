@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from "svelte";
   import Cart from "./Cart.svelte";
   import { titles, descriptions, markers } from "./meta_info";
   export let key = "",
@@ -9,6 +10,17 @@
     code_header = "",
     code_type = "",
     code_footer = "";
+  let size = [0, 0],
+    colorFunc = () => {},
+    max_dist = 1;
+  onMount(() => {
+    if (value) {
+      size[0] = value?.length || 0;
+      size[1] = value?.[0]?.length || 0;
+      max_dist = Math.max(...value?.map((d) => Math.max(...d)));
+      colorFunc = (v) => (1 - v / max_dist) * 0.8;
+    }
+  });
 </script>
 
 <article>
@@ -27,40 +39,26 @@
   {:else if level == 2}
     <h3>{titles[key]}</h3>
   {/if}
-  <div class="value">
+  <div class="content-wrap">
     <table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Value</th>
-          <th>Unit</th>
-          <th>As of</th>
-          <th>-</th>
+          <th></th>
+          {#each Array(size[1]) as _, j}
+            <th>{j}</th>
+          {/each}
         </tr>
       </thead>
       <tbody>
-        {#each Object.keys(value) as key, ki}
+        {#each Array(size[0]) as _, i}
           <tr>
-            <th>{key}</th><td>{value[key].value}</td><td>{value[key].unit}</td
-            ><td>{value[key].asof}</td>
-            <td>
-              {#if addToBasket}
-                <button
-                  class="basket"
-                  on:click={() => {
-                    addToBasket(
-                      `${key}_${ki} = ${code_header}${key}${code_footer}`,
-                    );
-                  }}
-                >
-                  <Cart
-                    on={$basket.includes(
-                      `${key}_${ki} = ${code_header}${key}${code_footer}`,
-                    )}
-                  ></Cart>
-                </button>
-              {/if}
-            </td>
+            <th>{i}</th>
+            {#each Array(size[1]) as _, j}
+              <td
+                style={`background-color: rgba(255, 102, 13, ${colorFunc(value?.[i]?.[j])})`}
+                >{value?.[i]?.[j]}</td
+              >
+            {/each}
           </tr>
         {/each}
       </tbody>
@@ -78,7 +76,11 @@
     border: 1px solid #aaa;
     background-color: #fafafa;
     box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.15);
-    grid-column: span 3;
+    grid-column: span 4;
+  }
+  .content-wrap {
+    overflow: scroll;
+    max-height: 600px;
   }
   .basket {
     position: absolute;
@@ -95,12 +97,6 @@
   .basket:hover {
     background-color: rgba(0, 0, 0, 0.15);
   }
-  table .basket {
-    position: relative;
-    top: 0;
-    right: 0;
-    padding: 0;
-  }
   h2 {
     font-size: 0.9rem;
     font-weight: 600;
@@ -110,12 +106,6 @@
     font-size: 0.9rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
-  }
-  .value {
-    font-family: var(--font-mono);
-    font-size: 1.1rem;
-    max-height: 200px;
-    overflow-y: scroll;
   }
   .desc {
     font-size: 0.85rem;
@@ -129,11 +119,17 @@
   table th,
   table td {
     border: 1px solid #ddd;
-    padding: 0.25rem 0.1rem;
+    text-align: center;
+    font-family: var(--font-mono);
   }
-  thead th {
-    background-color: white;
+  table thead th {
     position: sticky;
-    top: -1px;
+    top: 0;
+    background-color: white;
+  }
+  table tbody th {
+    position: sticky;
+    left: 0;
+    background-color: white;
   }
 </style>

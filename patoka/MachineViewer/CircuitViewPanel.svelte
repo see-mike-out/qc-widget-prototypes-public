@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import Cart from "./Cart.svelte";
-  import { titles, descriptions, markers } from "./meta_info";
+  import { titles, descriptions } from "./meta_info";
   import QubitEdge from "./QubitEdge.svelte";
   import QubitNode from "./QubitNode.svelte";
   import { writable } from "svelte/store";
@@ -41,7 +41,7 @@
     n_rows = Math.max(...qubit_nodes.map((d) => d.y)) + 1;
     n_cols = Math.max(...qubit_nodes.map((d) => d.x)) + 1;
     width = (n_cols - 1) * qubit_gap + padding * 2;
-    height = (n_rows - 1) * qubit_gap + padding * 2;
+    height = n_rows * qubit_gap + padding * 2;
 
     node_map = {};
     for (const node of qubit_nodes) {
@@ -148,12 +148,10 @@
   let showTooltip = false,
     tooltipX,
     tooltipY,
-    tooltipInfo = {},
-    persistTooltip = false;
+    tooltipInfo = {};
   function openTooltip(e, item, key, value, id, qubits) {
     showTooltip = true;
-    tooltipX = e.screenX - mouse_adj.x;
-    tooltipY = e.screenY - mouse_adj.y;
+    tooltipY = e.target.offsetTop + 100;
     tooltipInfo = { item, key, value };
     Array.from(document.querySelectorAll(".circuit-element")).forEach(
       (elem) => {
@@ -190,7 +188,7 @@
       circuitElemCartKeyFoot = "])";
     }
 
-    circuitElemCartKey = `${key.gate ? key.gate + "_" + key.type : key.feature}_${qubits.join("_")} = ${circuitElemCartKeyHead}${qubits.join(",")}${circuitElemCartKeyFoot}`;
+    circuitElemCartKey = `circuit_${key.gate ? key.gate + "_" + key.type : key.feature}_${qubits.join("_")} = ${circuitElemCartKeyHead}${qubits.join(",")}${circuitElemCartKeyFoot}`;
   }
   function moveTooltip(e) {
     if (showTooltip) {
@@ -198,29 +196,13 @@
       tooltipY = e.screenY - mouse_adj.y;
     }
   }
-  function keepTooltip(e) {
-    persistTooltip = true;
-  }
-  function unkeepTooltip(e) {
-    persistTooltip = false;
+  function hideTooltip() {
     showTooltip = false;
     Array.from(document.querySelectorAll(".circuit-element")).forEach(
       (elem) => {
         elem.style.outline = null;
       },
     );
-  }
-  function hideTooltip() {
-    setTimeout(() => {
-      if (!persistTooltip) {
-        showTooltip = false;
-        Array.from(document.querySelectorAll(".circuit-element")).forEach(
-          (elem) => {
-            elem.style.outline = null;
-          },
-        );
-      }
-    }, 1000);
   }
 
   // init
@@ -229,7 +211,7 @@
   });
 </script>
 
-<article>
+<article style="position: relative;">
   {#if addToBasket}
     <button
       class="basket"
@@ -294,7 +276,7 @@
   </div>
   <div
     class="circuit"
-    style={`width: ${width}px; height: ${height}px; padding: ${padding}px;`}
+    style={`width: ${width}px; height: ${height}px; padding: ${padding}px; padding-bottom: 3rem;`}
   >
     {#if qubit_edges && node_map}
       {#each qubit_edges as edge, ei}
@@ -337,58 +319,75 @@
         ></QubitNode>
       {/each}
     {/if}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div
+      class="circuit-background"
+      on:click={(e) => {
+        hideTooltip();
+      }}
+    ></div>
   </div>
   {#if descriptions[key]}
     <div class="desc">{descriptions[key]}</div>
   {/if}
-</article>
 
-{#if showTooltip}
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-  <div
-    class="tooltip"
-    style={`left: ${tooltipX}px; top: ${tooltipY}px;`}
-    on:mouseenter={(e) => {
-      keepTooltip(e);
-    }}
-    on:mousemove={(e) => {
-      keepTooltip(e);
-    }}
-    on:mouseleave={(e) => {
-      unkeepTooltip(e);
-    }}
-  >
-    <h5>
-      {tooltipInfo.item}–{tooltipInfo.key.gate || tooltipInfo.key.feature}
-      {tooltipInfo.key.type ? tooltipInfo.key.type : ""}
-    </h5>
+  {#if showTooltip}
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+    <div class="tooltip" style={`right: 1rem; top: ${tooltipY}px;`}>
+      <h5>
+        {tooltipInfo.item}–{tooltipInfo.key.gate || tooltipInfo.key.feature}
+        {tooltipInfo.key.type ? tooltipInfo.key.type : ""}
+      </h5>
 
-    {#if addToBasket}
-      <button
-        class="basket"
-        on:click={() => {
-          addToBasket(circuitElemCartKey);
-        }}
-      >
-        <Cart on={$basket.includes(circuitElemCartKey)}></Cart>
-      </button>
-    {/if}
-    <table>
-      <tr>
-        <th>Value</th><td> {tooltipInfo.value.value}</td>
-      </tr>
-      <tr>
-        <th>Date</th><td> {tooltipInfo.value.asof}</td>
-      </tr>
-      {#if tooltipInfo.value.unit}
+      <table>
         <tr>
-          <th>Unit</th><td> {tooltipInfo.value.unit}</td>
+          <th>Value</th><td> {tooltipInfo.value.value}</td>
         </tr>
-      {/if}
-    </table>
-  </div>
-{/if}
+        <tr>
+          <th>Date</th><td> {tooltipInfo.value.asof}</td>
+        </tr>
+        {#if tooltipInfo.value.unit}
+          <tr>
+            <th>Unit</th><td> {tooltipInfo.value.unit}</td>
+          </tr>
+        {/if}
+      </table>
+
+      <div style="text-align: right;">
+        {#if addToBasket}
+          <button
+            class="basket"
+            on:click={() => {
+              addToBasket(circuitElemCartKey);
+            }}
+          >
+            <Cart on={$basket.includes(circuitElemCartKey)}></Cart>
+          </button>
+        {/if}
+        <button
+          class="close"
+          on:click={() => {
+            hideTooltip();
+          }}
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-x"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  {/if}
+</article>
 
 <style>
   article {
@@ -397,11 +396,11 @@
     border: 1px solid #aaa;
     background-color: #fafafa;
     box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.15);
+    grid-column: span 6;
   }
-  .basket {
+  .basket,
+  .close {
     position: absolute;
-    top: 0.25rem;
-    right: 0.25rem;
     padding: 0.25rem 0.5rem;
     appearance: none;
     border: 0;
@@ -409,12 +408,19 @@
     cursor: pointer;
     border-radius: 0.25rem;
     line-height: 100%;
+    text-align: center;
   }
-  .basket:hover {
+  .basket {
+    top: 0.25rem;
+    right: 0.25rem;
+  }
+  .basket:hover,
+  .close:hover {
     background-color: rgba(0, 0, 0, 0.15);
   }
   .circuit {
     position: relative;
+    padding-bottom: 2rem;
   }
   h2 {
     font-size: 0.9rem;
@@ -434,6 +440,7 @@
   .controls {
     display: flex;
     column-gap: 1rem;
+    padding: 0 2rem;
   }
   .controls > div {
     width: 330px;
@@ -450,19 +457,29 @@
     border-radius: 0.25rem;
   }
   .tooltip {
-    position: fixed;
-    padding: 0.85rem;
+    position: absolute;
+    padding: 0.85rem 0.85rem 0.5rem 0.85rem;
     border: 1px solid #333;
     background-color: white;
-    font-family: iosevka;
+    font-family: var(--font-mono);
     z-index: 300;
     line-height: 100%;
   }
   .tooltip h5 {
-    margin: 0 0.25rem 0.25rem 0.25rem;
+    margin: 0 0.25rem 0.75rem 0.25rem;
     padding: 0;
     font-size: 0.9rem;
     font-weight: 700;
+    line-height: 100%;
+  }
+  .tooltip .close,
+  .tooltip .basket {
+    position: relative;
+    top: 0;
+    left: 0;
+    padding: 0.25rem;
+    width: 1.5rem;
+    margin-top: 0.25rem;
     line-height: 100%;
   }
   .tooltip table {
