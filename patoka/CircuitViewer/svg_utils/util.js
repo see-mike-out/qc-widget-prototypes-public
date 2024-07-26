@@ -9,15 +9,16 @@ export function get_radian_names(value) {
     return "-π";
   else {
     let sign = ratio < 0 ? "-" : "";
-    let abs_ratio = Math.abs(ratio);
+    let abs_ratio = Math.abs(ratio).toPrecision(8);
     let done = [];
     for (let div of ratio_divider) {
       for (let nom = 1; nom < div; nom++) {
-        if (!done.includes(nom / div)) {
-          if (abs_ratio == nom / div) {
+        let r = (nom / div).toPrecision(8)
+        if (!done.includes(r)) {
+          if (abs_ratio == r) {
             return sign + (nom == 1 ? "" : nom) + "π/" + div;
           } else {
-            done.push(nom / div);
+            done.push(r);
           }
         }
       }

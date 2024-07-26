@@ -1,5 +1,5 @@
 def timeToStr(dt):
-    return dt.strftime("%m/%d/%Y, %H:%M:%S")
+    return dt.strftime("%m/%d/%Y, %H:%M:%S") if dt is not None else ""
     
 def process_qubit_data(data):
     output = []

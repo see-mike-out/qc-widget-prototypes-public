@@ -59,8 +59,8 @@ class PassData:
         self.transpiled_circuit_layered = data["transpiled_circuit_layered"]
         self.traspiling_match = data["traspiling_match"]
         self.backend_data = data["backend_data"]
-        self.original_global_phase = get_global_pahse(data["original_circuit"][2])
-        self.transpiled_global_phase = get_global_pahse(data["transpiled_circuit"][2])
+        self.original_global_phase = get_global_pahse(data["original_circuit"][2]) if len(data["original_circuit"]) >= 3 else 0
+        self.transpiled_global_phase = get_global_pahse(data["transpiled_circuit"][2]) if len(data["transpiled_circuit"]) >= 3 else 0
         self.esp = data["esp"]
 
     def toJSON(self):
