@@ -13,3 +13,7 @@
 
 4. To use the prototypes, run a node server
 `npm run dev`
+
+## Install Node.js
+
+Visit: https://nodejs.org/en
