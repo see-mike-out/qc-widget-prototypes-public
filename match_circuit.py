@@ -180,6 +180,7 @@ def match_circuits(explication, transpiled, mapping, pass_manager):
     return matches, check
 
 # gate explications
+# The comments are copied from the official Qiskit documentation.
 def get_gate(gate_name, n_qubits, params):
     gate = None
     # C3XGate(*args[, _force_mutable])	The X gate controlled on 3 qubits.
