@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022 WisTex TechSero Ltd. Co.
+Copyright (c) 2025 Hyeok Kim
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,4 +20,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This license only applies to non-Qiskit codes and assets.
+This license only applies to non-Qiskit codes and assets. Codes from Qiskit
+are noted in relevant files.
